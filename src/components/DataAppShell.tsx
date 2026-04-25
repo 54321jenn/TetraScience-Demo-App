@@ -259,22 +259,12 @@ function SidebarBody({
                       <TooltipTrigger asChild>
                         <button
                           type="button"
-                          className="flex flex-col items-center gap-0.5 cursor-pointer bg-transparent border-none p-0 w-full"
+                          className="flex items-center justify-center cursor-pointer bg-transparent border-none p-0 w-full"
                           onClick={handleClick}
                         >
                           <div className={pageIconCn(page.isActive ?? false, true)}>
                             {iconEl}
                           </div>
-                          <span
-                            className={cn(
-                              "text-[10px] font-medium leading-tight text-center",
-                              page.isActive
-                                ? "text-foreground font-semibold"
-                                : "text-muted-foreground"
-                            )}
-                          >
-                            {page.label}
-                          </span>
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="right">{page.label}</TooltipContent>
