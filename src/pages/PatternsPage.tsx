@@ -46,6 +46,9 @@ import {
   TabsTrigger,
   Textarea,
 } from "@tetrascience-npm/tetrascience-react-ui";
+import { LoadingPatterns } from "@/pages/patterns/LoadingPatterns";
+import { DataToolsPatterns } from "@/pages/patterns/DataToolsPatterns";
+import { LayoutPatterns } from "@/pages/patterns/LayoutPatterns";
 import {
   AlertCircle,
   Check,
@@ -669,6 +672,9 @@ export function PatternsPage() {
           <TabsTrigger value="empty-states">Empty States</TabsTrigger>
           <TabsTrigger value="dialogs">Dialogs</TabsTrigger>
           <TabsTrigger value="forms">Forms</TabsTrigger>
+          <TabsTrigger value="loading">Loading</TabsTrigger>
+          <TabsTrigger value="data-tools">Data Tools</TabsTrigger>
+          <TabsTrigger value="layout">Layout</TabsTrigger>
           <TabsTrigger value="404">404 / Error</TabsTrigger>
         </TabsList>
 
@@ -862,6 +868,21 @@ export function PatternsPage() {
               <SideSheetForm />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ── Loading ──────────────────────────────────────────────────── */}
+        <TabsContent value="loading" className="mt-6">
+          <LoadingPatterns />
+        </TabsContent>
+
+        {/* ── Data Tools ───────────────────────────────────────────────── */}
+        <TabsContent value="data-tools" className="mt-6">
+          <DataToolsPatterns />
+        </TabsContent>
+
+        {/* ── Layout ───────────────────────────────────────────────────── */}
+        <TabsContent value="layout" className="mt-6">
+          <LayoutPatterns />
         </TabsContent>
 
         {/* ── 404 / Error ──────────────────────────────────────────────── */}
