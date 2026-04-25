@@ -1,36 +1,88 @@
 import { useState } from "react";
 import {
   BarChart2,
+  BarChart3,
   Code2,
+  Download,
+  Filter,
+  FlaskConical,
   LayoutGrid,
   LogOut,
+  Moon,
+  LayoutDashboard,
+  Search,
+  Sun,
   Table2,
 } from "lucide-react";
 import {
   Avatar,
   AvatarFallback,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@tetrascience-npm/tetrascience-react-ui";
 
 import { DataAppShell } from "@/components/DataAppShell";
+import { WorkflowPanel, type WorkflowStep } from "@/components/WorkflowPanel";
+import { HelpSheet } from "@/components/HelpSheet";
+import { useTheme } from "@/lib/theme";
 import { OverviewPage } from "@/pages/OverviewPage";
 import { DataTablePage } from "@/pages/DataTablePage";
 import { ChartsPage } from "@/pages/ChartsPage";
 import { CodeEditorPage } from "@/pages/CodeEditorPage";
+import { WorkflowPage } from "@/pages/WorkflowPage";
+import { PatternsPage } from "@/pages/PatternsPage";
 
-type Page = "overview" | "data-table" | "charts" | "code-editor";
+type Page = "overview" | "data-table" | "charts" | "code-editor" | "workflow" | "patterns";
 
 const PAGE_LABELS: Record<Page, string> = {
   overview: "Components",
   "data-table": "Data Table",
   charts: "Charts",
   "code-editor": "Code Editor",
+  workflow: "Workflow",
+  patterns: "Patterns",
 };
+
+const WORKFLOW_STEPS: WorkflowStep[] = [
+  { id: "data-overview", label: "Data Overview", icon: LayoutGrid, input: 649568, output: 645396 },
+  { id: "global-filtering", label: "Global Filtering", icon: Filter, input: 645396, output: 4823 },
+  { id: "explore-clusters", label: "Explore Clusters", icon: BarChart3, input: 4823, output: 20 },
+  { id: "review-selection", label: "Review Selection", icon: Search, input: 20, output: 15 },
+  { id: "export-primary-list", label: "Export Primary List", icon: Download, output: 15 },
+];
+
+function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-7 h-7 text-muted-foreground"
+          onClick={toggleTheme}
+        >
+          {resolvedTheme === "dark" ? (
+            <Sun className="w-4 h-4" />
+          ) : (
+            <Moon className="w-4 h-4" />
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 
 function UserMenu() {
   return (
@@ -60,6 +112,14 @@ function UserMenu() {
 
 function App() {
   const [activePage, setActivePage] = useState<Page>("overview");
+  const [activeStepId, setActiveStepId] = useState("data-overview");
+  const [workflowCollapsed, setWorkflowCollapsed] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  const isWorkflow = activePage === "workflow";
+  const activeStep = WORKFLOW_STEPS.find((s) => s.id === activeStepId);
+  const activeStepIndex = WORKFLOW_STEPS.findIndex((s) => s.id === activeStepId);
+  const hasNext = activeStepIndex < WORKFLOW_STEPS.length - 1;
 
   const navGroups = [
     {
@@ -92,30 +152,102 @@ function App() {
           isActive: activePage === "code-editor",
           onClick: () => setActivePage("code-editor"),
         },
+        {
+          id: "patterns",
+          label: "Patterns",
+          icon: LayoutDashboard,
+          isActive: activePage === "patterns",
+          onClick: () => setActivePage("patterns"),
+        },
+        {
+          id: "workflow",
+          label: "Workflow",
+          icon: FlaskConical,
+          isActive: activePage === "workflow",
+          onClick: () => setActivePage("workflow"),
+        },
       ],
     },
   ];
 
+  const breadcrumbs = isWorkflow
+    ? [
+        { label: "All Datasets" },
+        { label: "DUX4", onClick: () => setActiveStepId("data-overview") },
+        { label: "Primary Screening", onClick: () => setActiveStepId("data-overview") },
+        { label: activeStep?.label ?? "" },
+      ]
+    : [{ label: "TetraScience UI" }, { label: PAGE_LABELS[activePage] }];
+
+  const workflowHeaderActions = isWorkflow ? (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 text-sm">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+          INPUT
+        </span>
+        <span className="font-semibold tabular-nums">
+          {activeStep?.input !== undefined ? activeStep.input.toLocaleString() : "—"}
+        </span>
+      </div>
+      <span className="text-muted-foreground">→</span>
+      <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-0.5 text-sm">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+          OUTPUT
+        </span>
+        <span className="font-semibold tabular-nums">
+          {activeStep?.output !== undefined ? activeStep.output.toLocaleString() : "—"}
+        </span>
+      </div>
+      <Button
+        size="sm"
+        disabled={!hasNext}
+        onClick={() => hasNext && setActiveStepId(WORKFLOW_STEPS[activeStepIndex + 1].id)}
+      >
+        Next
+      </Button>
+    </div>
+  ) : null;
+
+  const headerActions = (
+    <div className="flex items-center gap-1">
+      {workflowHeaderActions}
+      <ThemeToggle />
+    </div>
+  );
+
+  const sidebarPanel = isWorkflow ? (
+    <WorkflowPanel
+      steps={WORKFLOW_STEPS}
+      activeStepId={activeStepId}
+      onStepClick={setActiveStepId}
+      collapsed={workflowCollapsed}
+      onToggleCollapse={() => setWorkflowCollapsed((c) => !c)}
+    />
+  ) : undefined;
+
   return (
-    <DataAppShell
-      appName="TS"
-      appFullName="TetraScience UI"
-      version="0.5.0-beta.33.1"
-      navGroups={navGroups}
-      userMenu={<UserMenu />}
-      breadcrumbs={[
-        { label: "TetraScience UI" },
-        { label: PAGE_LABELS[activePage] },
-      ]}
-      onHelpClick={() =>
-        window.open("https://github.com/tetrascience/ts-lib-ui-kit", "_blank")
-      }
-    >
-      {activePage === "overview" && <OverviewPage />}
-      {activePage === "data-table" && <DataTablePage />}
-      {activePage === "charts" && <ChartsPage />}
-      {activePage === "code-editor" && <CodeEditorPage />}
-    </DataAppShell>
+    <>
+      <DataAppShell
+        appName="TS"
+        appFullName="TetraScience UI"
+        version="0.5.0-beta.33.1"
+        navGroups={navGroups}
+        userMenu={<UserMenu />}
+        breadcrumbs={breadcrumbs}
+        headerActions={headerActions}
+        sidebarPanel={sidebarPanel}
+        onHelpClick={() => setHelpOpen(true)}
+      >
+        {activePage === "overview" && <OverviewPage />}
+        {activePage === "data-table" && <DataTablePage />}
+        {activePage === "charts" && <ChartsPage />}
+        {activePage === "code-editor" && <CodeEditorPage />}
+        {activePage === "patterns" && <PatternsPage />}
+        {activePage === "workflow" && <WorkflowPage activeStepId={activeStepId} />}
+      </DataAppShell>
+
+      <HelpSheet open={helpOpen} onOpenChange={setHelpOpen} />
+    </>
   );
 }
 
