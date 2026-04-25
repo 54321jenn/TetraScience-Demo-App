@@ -2,6 +2,8 @@
 @import "@tetrascience-npm/tetrascience-react-ui/index.css";
 @import "@tetrascience-npm/tetrascience-react-ui/index.tailwind.css";
 
+@variant dark (&:is(.dark, .dark *));
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
