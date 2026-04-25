@@ -274,7 +274,7 @@ function ResizableSplit() {
     <div className="rounded-lg border border-border overflow-hidden h-72">
       {/* @ts-expect-error direction prop passes through to react-resizable-panels but isn't reflected in the wrapper type */}
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={35} minSize={20} maxSize={55}>
+        <ResizablePanel defaultSize="35%" minSize="20%" maxSize="55%">
           <div className="flex flex-col h-full">
             <div className="px-3 py-2 border-b border-border bg-muted/30">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -306,7 +306,7 @@ function ResizableSplit() {
 
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={65}>
+        <ResizablePanel defaultSize="65%">
           <div className="flex flex-col h-full">
             <div className="px-4 py-2 border-b border-border bg-muted/30 flex items-center justify-between">
               <p className="text-xs font-semibold text-foreground truncate">{selected.name}</p>
