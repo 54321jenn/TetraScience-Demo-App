@@ -225,7 +225,7 @@ export function OverviewPage() {
                 <Label htmlFor="terms">Accept terms and conditions</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox id="pre-checked" checked={true} readOnly />
+                <Checkbox id="pre-checked" checked={true} onCheckedChange={() => {}} />
                 <Label htmlFor="pre-checked">Pre-checked</Label>
               </div>
               <div className="flex items-center gap-2">
