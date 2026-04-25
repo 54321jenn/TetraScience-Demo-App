@@ -31,13 +31,10 @@ const SNACK_ICON: Record<SnackVariant, React.FC<React.SVGProps<SVGSVGElement>>> 
 };
 
 const SNACK_CN: Record<SnackVariant, string> = {
-  success:
-    "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100",
-  error:
-    "border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-100",
-  info: "border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100",
-  warning:
-    "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100",
+  success: "border-emerald-500/30 bg-emerald-500/10 text-foreground",
+  error:   "border-red-500/30 bg-red-500/10 text-foreground",
+  info:    "border-blue-500/30 bg-blue-500/10 text-foreground",
+  warning: "border-amber-500/30 bg-amber-500/10 text-foreground",
 };
 
 const SNACK_ICON_CN: Record<SnackVariant, string> = {
@@ -163,13 +160,10 @@ function SnackbarDemo() {
 type BannerVariant = "info" | "warning" | "error" | "success";
 
 const BANNER_CN: Record<BannerVariant, string> = {
-  info: "border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-100",
-  warning:
-    "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-100",
-  error:
-    "border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950/60 dark:text-red-100",
-  success:
-    "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-100",
+  info:    "border-blue-500/30 bg-blue-500/10 text-foreground",
+  warning: "border-amber-500/30 bg-amber-500/10 text-foreground",
+  error:   "border-red-500/30 bg-red-500/10 text-foreground",
+  success: "border-emerald-500/30 bg-emerald-500/10 text-foreground",
 };
 
 const BANNER_ICON: Record<BannerVariant, React.FC<React.SVGProps<SVGSVGElement>>> = {
