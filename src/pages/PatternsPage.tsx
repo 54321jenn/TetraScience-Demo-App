@@ -49,6 +49,7 @@ import {
 import { LoadingPatterns } from "@/pages/patterns/LoadingPatterns";
 import { DataToolsPatterns } from "@/pages/patterns/DataToolsPatterns";
 import { LayoutPatterns } from "@/pages/patterns/LayoutPatterns";
+import { FeedbackPatterns } from "@/pages/patterns/FeedbackPatterns";
 import {
   AlertCircle,
   Check,
@@ -673,6 +674,7 @@ export function PatternsPage() {
           <TabsTrigger value="dialogs">Dialogs</TabsTrigger>
           <TabsTrigger value="forms">Forms</TabsTrigger>
           <TabsTrigger value="loading">Loading</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
           <TabsTrigger value="data-tools">Data Tools</TabsTrigger>
           <TabsTrigger value="layout">Layout</TabsTrigger>
           <TabsTrigger value="404">404 / Error</TabsTrigger>
@@ -873,6 +875,11 @@ export function PatternsPage() {
         {/* ── Loading ──────────────────────────────────────────────────── */}
         <TabsContent value="loading" className="mt-6">
           <LoadingPatterns />
+        </TabsContent>
+
+        {/* ── Feedback ─────────────────────────────────────────────────── */}
+        <TabsContent value="feedback" className="mt-6">
+          <FeedbackPatterns />
         </TabsContent>
 
         {/* ── Data Tools ───────────────────────────────────────────────── */}

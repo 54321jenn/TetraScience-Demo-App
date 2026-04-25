@@ -26,6 +26,7 @@ import {
   Database,
   GitBranch,
   Info,
+  MoreHorizontal,
   Settings,
   Shield,
   Upload,
@@ -436,6 +437,118 @@ function ActivityFeed() {
 }
 
 // =============================================================================
+// Rich List Items
+// =============================================================================
+
+type ListItemStatus = "active" | "invited" | "inactive";
+
+const STATUS_CN: Record<ListItemStatus, string> = {
+  active:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  invited:
+    "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  inactive: "border-border bg-muted text-muted-foreground",
+};
+
+const TEAM_MEMBERS = [
+  {
+    initials: "JS",
+    name: "Dr. Jane Smith",
+    role: "Principal Scientist",
+    team: "Biology Platform",
+    status: "active" as ListItemStatus,
+    meta: "Last active 2h ago",
+    color: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
+  },
+  {
+    initials: "AP",
+    name: "Dr. Arjun Patel",
+    role: "Data Analyst",
+    team: "Informatics",
+    status: "active" as ListItemStatus,
+    meta: "Last active 1d ago",
+    color: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+  },
+  {
+    initials: "LC",
+    name: "Li Chen",
+    role: "Medicinal Chemist",
+    team: "Chemistry",
+    status: "invited" as ListItemStatus,
+    meta: "Invite sent Apr 23",
+    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+  },
+  {
+    initials: "MR",
+    name: "Marcus Reyes",
+    role: "Research Engineer",
+    team: "Biology Platform",
+    status: "active" as ListItemStatus,
+    meta: "Last active 3d ago",
+    color: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  },
+  {
+    initials: "FO",
+    name: "Fatima Osei",
+    role: "Bioinformatician",
+    team: "Informatics",
+    status: "inactive" as ListItemStatus,
+    meta: "Deactivated",
+    color: "bg-muted text-muted-foreground",
+  },
+];
+
+function RichListItems() {
+  return (
+    <div className="rounded-lg border border-border divide-y divide-border overflow-hidden">
+      {TEAM_MEMBERS.map((member) => (
+        <div
+          key={member.name}
+          className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
+        >
+          {/* Leading avatar */}
+          <div
+            className={cn(
+              "w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0",
+              member.color
+            )}
+          >
+            {member.initials}
+          </div>
+
+          {/* Primary + secondary text */}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{member.name}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {member.role} · {member.team}
+            </p>
+          </div>
+
+          {/* Trailing metadata */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs text-muted-foreground hidden sm:block">{member.meta}</span>
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize",
+                STATUS_CN[member.status]
+              )}
+            >
+              {member.status}
+            </span>
+            <button
+              type="button"
+              className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// =============================================================================
 // LayoutPatterns export
 // =============================================================================
 
@@ -453,6 +566,21 @@ export function LayoutPatterns() {
         </CardHeader>
         <CardContent>
           <AccordionConfig />
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Rich List Items</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            List rows with a leading avatar, primary + secondary text, and trailing metadata or
+            actions. Use for team members, datasets, or any entity with multiple attributes.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <RichListItems />
         </CardContent>
       </Card>
 

@@ -19,3 +19,8 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+@keyframes indeterminate {
+  0% { left: -40%; }
+  100% { left: 120%; }
+}

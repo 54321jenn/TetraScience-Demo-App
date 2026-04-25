@@ -18,7 +18,7 @@ import {
   SelectValue,
   Separator,
 } from "@tetrascience-npm/tetrascience-react-ui";
-import { Check, Copy, Filter, Search, X } from "lucide-react";
+import { Check, Copy, Download, Filter, Search, Tag, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // =============================================================================
@@ -376,6 +376,126 @@ function ResizableSplit() {
 }
 
 // =============================================================================
+// Contextual Action Bar
+// =============================================================================
+
+const SELECTABLE_ROWS = [
+  { id: "EXP-001", name: "DUX4 Primary Screen", assay: "Primary Screen", team: "Biology" },
+  { id: "EXP-002", name: "ALS Validation Run", assay: "Secondary Screen", team: "Chemistry" },
+  { id: "EXP-003", name: "Counter Screen QC", assay: "Counter Screen", team: "Informatics" },
+  { id: "EXP-004", name: "HTF Cluster Analysis", assay: "Primary Screen", team: "Biology" },
+  { id: "EXP-005", name: "KRAS Inhibitor Panel", assay: "Secondary Screen", team: "Chemistry" },
+];
+
+function ContextualActionBar() {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    setSelected((prev) =>
+      prev.size === SELECTABLE_ROWS.length
+        ? new Set()
+        : new Set(SELECTABLE_ROWS.map((r) => r.id))
+    );
+  }
+
+  const allChecked = selected.size === SELECTABLE_ROWS.length;
+  const someChecked = selected.size > 0 && !allChecked;
+
+  return (
+    <div className="rounded-lg border border-border overflow-hidden text-sm">
+      {/* Contextual bar — appears when rows are selected */}
+      <div
+        className={cn(
+          "flex items-center gap-3 px-4 py-2.5 border-b border-border transition-colors",
+          selected.size > 0
+            ? "bg-primary/5 border-primary/20"
+            : "bg-muted/30"
+        )}
+      >
+        <input
+          type="checkbox"
+          checked={allChecked}
+          ref={(el) => { if (el) el.indeterminate = someChecked; }}
+          onChange={toggleAll}
+          className="accent-primary cursor-pointer"
+          aria-label="Select all"
+        />
+
+        {selected.size > 0 ? (
+          <>
+            <span className="text-xs font-semibold text-primary">
+              {selected.size} selected
+            </span>
+            <div className="flex items-center gap-1.5 ml-1">
+              <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5">
+                <Download className="w-3 h-3" />
+                Export
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5">
+                <Tag className="w-3 h-3" />
+                Tag
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:border-destructive/60"
+              >
+                <Trash2 className="w-3 h-3" />
+                Delete
+              </Button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelected(new Set())}
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              Clear
+            </button>
+          </>
+        ) : (
+          <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 flex-1 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <span>Experiment</span>
+            <span>Assay</span>
+            <span>Team</span>
+          </div>
+        )}
+      </div>
+
+      {SELECTABLE_ROWS.map((row) => (
+        <div
+          key={row.id}
+          onClick={() => toggle(row.id)}
+          className={cn(
+            "grid grid-cols-[auto_1fr_auto_auto] gap-x-4 px-4 py-2.5 border-b border-border last:border-0 items-center cursor-pointer transition-colors",
+            selected.has(row.id) ? "bg-primary/5" : "hover:bg-muted/40"
+          )}
+        >
+          <input
+            type="checkbox"
+            checked={selected.has(row.id)}
+            onChange={() => toggle(row.id)}
+            onClick={(e) => e.stopPropagation()}
+            className="accent-primary cursor-pointer"
+          />
+          <span className="font-medium truncate">{row.name}</span>
+          <span className="text-muted-foreground text-xs">{row.assay}</span>
+          <span className="text-muted-foreground text-xs">{row.team}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// =============================================================================
 // DataToolsPatterns export
 // =============================================================================
 
@@ -408,6 +528,21 @@ export function DataToolsPatterns() {
         </CardHeader>
         <CardContent>
           <CopyToClipboard />
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Contextual Action Bar</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Actions that appear when rows are selected. The header transforms from column labels
+            into a count + action bar. Clicking the row or checkbox toggles selection.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ContextualActionBar />
         </CardContent>
       </Card>
 

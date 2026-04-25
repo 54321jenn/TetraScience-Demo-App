@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import {
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -7,6 +9,120 @@ import {
   Skeleton,
 } from "@tetrascience-npm/tetrascience-react-ui";
 import { cn } from "@/lib/utils";
+
+// =============================================================================
+// Progress Bars
+// =============================================================================
+
+function LinearProgress({
+  value,
+  indeterminate = false,
+  className,
+}: {
+  value?: number;
+  indeterminate?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("h-1.5 w-full bg-muted rounded-full overflow-hidden relative", className)}>
+      {indeterminate ? (
+        <div
+          className="absolute h-full w-[40%] bg-primary rounded-full"
+          style={{ animation: "indeterminate 1.4s linear infinite" }}
+        />
+      ) : (
+        <div
+          className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+          style={{ width: `${Math.min(100, Math.max(0, value ?? 0))}%` }}
+        />
+      )}
+    </div>
+  );
+}
+
+const UPLOAD_FILES = [
+  { name: "primary_screen_b7.csv", size: "84.2 MB", target: 100 },
+  { name: "secondary_screen_b3.csv", size: "12.1 MB", target: 67 },
+  { name: "counter_screen.csv", size: "3.4 MB", target: 34 },
+];
+
+function ProgressExamples() {
+  const [progress, setProgress] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (!running) return;
+    if (progress >= 100) { setRunning(false); return; }
+    const t = setTimeout(() => setProgress((p) => Math.min(100, p + 4)), 80);
+    return () => clearTimeout(t);
+  }, [running, progress]);
+
+  function handleStart() {
+    setProgress(0);
+    setRunning(true);
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Indeterminate */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+          Indeterminate
+        </p>
+        <p className="text-xs text-muted-foreground mb-2">
+          Use when total duration is unknown — connecting, validating, waiting.
+        </p>
+        <LinearProgress indeterminate />
+      </div>
+
+      <Separator />
+
+      {/* Determinate interactive */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+          Determinate
+        </p>
+        <p className="text-xs text-muted-foreground mb-3">
+          Use when progress can be measured — file upload, batch processing.
+        </p>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm mb-1">
+            <span className="font-medium">Processing Primary Screen</span>
+            <span className="text-muted-foreground tabular-nums">{progress}%</span>
+          </div>
+          <LinearProgress value={progress} />
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={handleStart} disabled={running}>
+              {running ? "Running…" : progress === 100 ? "Restart" : "Start"}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Multi-file upload list */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+          Multi-file upload
+        </p>
+        <div className="space-y-3">
+          {UPLOAD_FILES.map((f) => (
+            <div key={f.name} className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium truncate">{f.name}</span>
+                <span className="text-muted-foreground ml-2 shrink-0">
+                  {f.target === 100 ? "Complete" : `${f.target}%`}
+                </span>
+              </div>
+              <LinearProgress value={f.target} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // =============================================================================
 // Skeleton Loaders
@@ -147,6 +263,21 @@ const SAMPLE_JOBS = [
 export function LoadingPatterns() {
   return (
     <div className="space-y-8">
+      {/* Progress bars */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Progress Bars</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Linear progress for file uploads, batch jobs, and processing pipelines. Use
+            indeterminate when duration is unknown, determinate when it can be measured.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ProgressExamples />
+        </CardContent>
+      </Card>
+
+      <Separator />
       {/* Skeleton loaders */}
       <Card>
         <CardHeader>
