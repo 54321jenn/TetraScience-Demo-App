@@ -1,182 +1,314 @@
+import { useState } from "react";
 import {
-  Card,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Badge,
   Button,
-  Toggle,
-  Tooltip,
-  TabGroup,
+  ButtonGroup,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Checkbox,
+  Label,
+  Separator,
+  Switch,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Textarea,
-  Toast,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@tetrascience-npm/tetrascience-react-ui";
-import { useState } from "react";
+import { AlertCircle, CheckCircle2, Info, TriangleAlert } from "lucide-react";
 
 export function OverviewPage() {
   const [checked, setChecked] = useState(false);
-  const [toggled, setToggled] = useState(false);
-  const [activeTab, setActiveTab] = useState("buttons");
+  const [switchOn, setSwitchOn] = useState(false);
 
   return (
     <div className="p-8 space-y-8 max-w-5xl">
       <div>
         <h1 className="text-2xl font-semibold mb-1">TetraScience UI Showcase</h1>
         <p className="text-muted-foreground text-sm">
-          Exploring all components from{" "}
+          Exploring components from{" "}
           <code className="text-xs bg-muted px-1 py-0.5 rounded">
-            @tetrascience-npm/tetrascience-react-ui
+            @tetrascience-npm/tetrascience-react-ui@0.5.0-beta
           </code>
         </p>
       </div>
 
-      <TabGroup
-        tabs={[
-          { id: "buttons", label: "Buttons & Badges" },
-          { id: "cards", label: "Cards" },
-          { id: "inputs", label: "Inputs" },
-          { id: "feedback", label: "Feedback" },
-        ]}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-      />
+      <Tabs defaultValue="buttons">
+        <TabsList>
+          <TabsTrigger value="buttons">Buttons & Badges</TabsTrigger>
+          <TabsTrigger value="cards">Cards</TabsTrigger>
+          <TabsTrigger value="inputs">Inputs</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
+        </TabsList>
 
-      {activeTab === "buttons" && (
-        <div className="space-y-6">
-          <Card title="Buttons" variant="outlined">
-            <div className="space-y-4">
+        {/* ── Buttons & Badges ──────────────────────────────────────────── */}
+        <TabsContent value="buttons" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Buttons</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Variants</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                  Variants
+                </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="primary">Primary</Button>
+                  <Button>Default</Button>
                   <Button variant="secondary">Secondary</Button>
-                  <Button variant="tertiary">Tertiary</Button>
-                  <Button variant="primary" loading>Loading</Button>
-                  <Button variant="primary" disabled>Disabled</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="ghost">Ghost</Button>
+                  <Button variant="destructive">Destructive</Button>
+                  <Button variant="link">Link</Button>
+                  <Button disabled>Disabled</Button>
                 </div>
               </div>
+              <Separator />
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Sizes</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                  Sizes
+                </p>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Button variant="primary" size="small">Small</Button>
-                  <Button variant="primary" size="medium">Medium</Button>
-                  <Button variant="secondary" size="small">Small Secondary</Button>
-                  <Button variant="secondary" size="medium">Medium Secondary</Button>
+                  <Button size="xs">XS</Button>
+                  <Button size="sm">Small</Button>
+                  <Button>Default</Button>
+                  <Button size="lg">Large</Button>
                 </div>
               </div>
+              <Separator />
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Full Width</p>
-                <Button variant="primary" fullWidth>Full Width Button</Button>
+                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                  Button Group
+                </p>
+                <ButtonGroup>
+                  <Button variant="outline">Left</Button>
+                  <Button variant="outline">Center</Button>
+                  <Button variant="outline">Right</Button>
+                </ButtonGroup>
               </div>
-            </div>
+            </CardContent>
           </Card>
 
-          <Card title="Badges" variant="outlined">
-            <div className="flex flex-wrap gap-3">
-              <Badge variant="default">Default</Badge>
-              <Badge variant="primary">Primary</Badge>
-              <Badge variant="default" size="small">Small Default</Badge>
-              <Badge variant="primary" size="small">Small Primary</Badge>
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Badges</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-3">
+                <Badge>Default</Badge>
+                <Badge variant="secondary">Secondary</Badge>
+                <Badge variant="outline">Outline</Badge>
+                <Badge variant="destructive">Destructive</Badge>
+              </div>
+            </CardContent>
           </Card>
 
-          <Card title="Tooltip" variant="outlined">
-            <div className="flex gap-4">
-              <Tooltip content="This is a helpful tooltip" placement="top">
-                <Button variant="secondary">Hover (top)</Button>
-              </Tooltip>
-              <Tooltip content="Tooltip on the right" placement="right">
-                <Button variant="secondary">Hover (right)</Button>
-              </Tooltip>
-              <Tooltip content="Bottom tooltip content" placement="bottom">
-                <Button variant="secondary">Hover (bottom)</Button>
-              </Tooltip>
-              <Tooltip content="Left tooltip content" placement="left">
-                <Button variant="secondary">Hover (left)</Button>
-              </Tooltip>
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Tooltips</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-4">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline">Hover (top)</Button>
+                  </TooltipTrigger>
+                  <TooltipContent>This is a helpful tooltip</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline">Hover (right)</Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Tooltip on the right</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline">Hover (bottom)</Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Bottom tooltip</TooltipContent>
+                </Tooltip>
+              </div>
+            </CardContent>
           </Card>
-        </div>
-      )}
+        </TabsContent>
 
-      {activeTab === "cards" && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            <Card title="Default Card" variant="default">
-              <p className="text-sm text-muted-foreground">
-                Standard card with default styling. Used for grouping related content.
-              </p>
+        {/* ── Cards ──────────────────────────────────────────────────────── */}
+        <TabsContent value="cards" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Default Card</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Standard card for grouping related content.
+                </p>
+              </CardContent>
             </Card>
-            <Card title="Outlined Card" variant="outlined">
-              <p className="text-sm text-muted-foreground">
-                Outlined card with a visible border. Ideal for forms and settings.
-              </p>
+            <Card className="border-2 border-primary/20">
+              <CardHeader>
+                <CardTitle>Highlighted Card</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Card with a custom border accent for emphasis.
+                </p>
+              </CardContent>
             </Card>
-            <Card title="Elevated Card" variant="elevated">
-              <p className="text-sm text-muted-foreground">
-                Elevated card with a drop shadow. Good for highlighting key info.
-              </p>
+            <Card className="bg-muted/30">
+              <CardHeader>
+                <CardTitle>Muted Card</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Card with a muted background for less prominent content.
+                </p>
+              </CardContent>
             </Card>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <Card title="Small" size="small" variant="outlined">
-              <p className="text-sm text-muted-foreground">Compact card for dense layouts.</p>
-            </Card>
-            <Card title="Medium" size="medium" variant="outlined">
-              <p className="text-sm text-muted-foreground">Standard medium card size.</p>
-            </Card>
-            <Card title="Large" size="large" variant="outlined">
-              <p className="text-sm text-muted-foreground">Large card for detailed content sections.</p>
-            </Card>
-          </div>
-        </div>
-      )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Stat Cards</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: "Total Samples", value: "1,284", delta: "+12%" },
+                  { label: "Experiments", value: "47", delta: "+3%" },
+                  { label: "Avg Purity", value: "98.2%", delta: "-0.4%" },
+                  { label: "Active Runs", value: "6", delta: "0" },
+                ].map((stat) => (
+                  <div key={stat.label} className="p-4 rounded-lg border bg-card space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                      {stat.label}
+                    </p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                    <p
+                      className={`text-xs font-medium ${
+                        stat.delta.startsWith("+")
+                          ? "text-emerald-600"
+                          : stat.delta.startsWith("-")
+                            ? "text-red-500"
+                            : "text-muted-foreground"
+                      }`}
+                    >
+                      {stat.delta}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {activeTab === "inputs" && (
-        <div className="space-y-6">
-          <Card title="Checkbox" variant="outlined">
-            <div className="space-y-3">
-              <Checkbox
-                label="Accept terms and conditions"
-                checked={checked}
-                onChange={() => setChecked(!checked)}
-              />
-              <Checkbox label="Pre-checked" checked={true} onChange={() => {}} />
-              <Checkbox label="Disabled unchecked" checked={false} onChange={() => {}} disabled />
-              <Checkbox label="Disabled checked" checked={true} onChange={() => {}} disabled />
-            </div>
+        {/* ── Inputs ─────────────────────────────────────────────────────── */}
+        <TabsContent value="inputs" className="space-y-6 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Checkbox</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="terms"
+                  checked={checked}
+                  onCheckedChange={(v) => setChecked(v === true)}
+                />
+                <Label htmlFor="terms">Accept terms and conditions</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox id="pre-checked" checked={true} readOnly />
+                <Label htmlFor="pre-checked">Pre-checked</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox id="disabled" disabled />
+                <Label htmlFor="disabled" className="text-muted-foreground">
+                  Disabled
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox id="disabled-checked" checked={true} disabled />
+                <Label htmlFor="disabled-checked" className="text-muted-foreground">
+                  Disabled checked
+                </Label>
+              </div>
+            </CardContent>
           </Card>
 
-          <Card title="Toggle" variant="outlined">
-            <div className="space-y-3">
-              <Toggle checked={toggled} onChange={setToggled} label="Enable notifications" />
-              <Toggle checked={true} onChange={() => {}} label="Always on" />
-              <Toggle checked={false} onChange={() => {}} label="Disabled" disabled />
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Switch</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="notifications"
+                  checked={switchOn}
+                  onCheckedChange={setSwitchOn}
+                />
+                <Label htmlFor="notifications">Enable notifications</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch id="always-on" checked={true} disabled />
+                <Label htmlFor="always-on" className="text-muted-foreground">
+                  Always on (disabled)
+                </Label>
+              </div>
+            </CardContent>
           </Card>
 
-          <Card title="Textarea" variant="outlined">
-            <div className="space-y-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Textarea</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
               <Textarea placeholder="Enter your notes here..." rows={4} />
-              <Textarea placeholder="Error state textarea" rows={2} error />
               <Textarea placeholder="Disabled textarea" rows={2} disabled />
-            </div>
+            </CardContent>
           </Card>
-        </div>
-      )}
+        </TabsContent>
 
-      {activeTab === "feedback" && (
-        <div className="space-y-6">
-          <Card title="Toast Notifications" variant="outlined">
-            <div className="space-y-3">
-              <Toast type="info" heading="Information" description="This is an informational message for the user." />
-              <Toast type="success" heading="Success" description="Operation completed successfully!" />
-              <Toast type="warning" heading="Warning" description="Please review your input before proceeding." />
-              <Toast type="danger" heading="Error" description="Something went wrong. Please try again." />
-              <Toast type="default" heading="Default" description="A standard notification message." />
-            </div>
-          </Card>
-        </div>
-      )}
+        {/* ── Feedback ───────────────────────────────────────────────────── */}
+        <TabsContent value="feedback" className="space-y-4 mt-6">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Information</AlertTitle>
+            <AlertDescription>
+              This is an informational message for the user.
+            </AlertDescription>
+          </Alert>
+
+          <Alert className="border-emerald-200 bg-emerald-50 text-emerald-900 [&>svg]:text-emerald-600">
+            <CheckCircle2 className="h-4 w-4" />
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>Operation completed successfully!</AlertDescription>
+          </Alert>
+
+          <Alert className="border-amber-200 bg-amber-50 text-amber-900 [&>svg]:text-amber-600">
+            <TriangleAlert className="h-4 w-4" />
+            <AlertTitle>Warning</AlertTitle>
+            <AlertDescription>
+              Please review your input before proceeding.
+            </AlertDescription>
+          </Alert>
+
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Something went wrong. Please try again.
+            </AlertDescription>
+          </Alert>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

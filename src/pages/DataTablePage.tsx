@@ -1,11 +1,17 @@
+import { type ColumnDef } from "@tanstack/react-table";
 import {
-  Table,
   Badge,
   Button,
   Card,
-  type TableColumn,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DataTable,
+  DataTableColumnToggle,
+  DataTablePagination,
+  TableToolbar,
 } from "@tetrascience-npm/tetrascience-react-ui";
-import { useState } from "react";
+import { Download } from "lucide-react";
 
 interface Sample {
   id: string;
@@ -32,119 +38,108 @@ const samples: Sample[] = [
   { id: "S-012", name: "Pleural Fluid L", type: "Pleural", status: "pending", concentration: 1.3, volume: 350, createdAt: "2024-01-26" },
 ];
 
-const statusBadge: Record<Sample["status"], { variant: "default" | "primary"; label: string }> = {
-  active: { variant: "primary", label: "Active" },
-  pending: { variant: "default", label: "Pending" },
-  failed: { variant: "default", label: "Failed" },
-  complete: { variant: "primary", label: "Complete" },
+const statusConfig: Record<Sample["status"], { variant: "default" | "secondary" | "outline" | "destructive"; label: string }> = {
+  active: { variant: "default", label: "Active" },
+  pending: { variant: "secondary", label: "Pending" },
+  failed: { variant: "destructive", label: "Failed" },
+  complete: { variant: "outline", label: "Complete" },
 };
 
-const columns: TableColumn<Sample>[] = [
-  { key: "id", header: "Sample ID", sortable: true, width: "100px" },
-  { key: "name", header: "Name", sortable: true },
+const columns: ColumnDef<Sample>[] = [
   {
-    key: "type",
+    accessorKey: "id",
+    header: "Sample ID",
+    size: 100,
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "type",
     header: "Type",
-    sortable: true,
-    filterable: true,
-    filterOptions: [
-      { label: "Serum", value: "Serum" },
-      { label: "Plasma", value: "Plasma" },
-      { label: "Urine", value: "Urine" },
-      { label: "Tissue", value: "Tissue" },
-      { label: "CSF", value: "CSF" },
-    ],
   },
   {
-    key: "status",
+    accessorKey: "status",
     header: "Status",
-    sortable: true,
-    render: (value: Sample["status"]) => (
-      <Badge variant={statusBadge[value].variant} size="small">
-        {statusBadge[value].label}
-      </Badge>
-    ),
+    cell: ({ getValue }) => {
+      const value = getValue<Sample["status"]>();
+      const cfg = statusConfig[value];
+      return <Badge variant={cfg.variant}>{cfg.label}</Badge>;
+    },
   },
   {
-    key: "concentration",
+    accessorKey: "concentration",
     header: "Conc. (mg/mL)",
-    sortable: true,
-    align: "right",
-    render: (value: number) => value.toFixed(1),
+    cell: ({ getValue }) => getValue<number>().toFixed(1),
   },
   {
-    key: "volume",
+    accessorKey: "volume",
     header: "Volume (µL)",
-    sortable: true,
-    align: "right",
-    render: (value: number) => value.toLocaleString(),
+    cell: ({ getValue }) => getValue<number>().toLocaleString(),
   },
-  { key: "createdAt", header: "Created", sortable: true },
+  {
+    accessorKey: "createdAt",
+    header: "Created",
+  },
+];
+
+const stats = [
+  { label: "Total", value: samples.length, color: "" },
+  { label: "Active", value: samples.filter((s) => s.status === "active").length, color: "text-blue-600" },
+  { label: "Complete", value: samples.filter((s) => s.status === "complete").length, color: "text-emerald-600" },
+  { label: "Failed", value: samples.filter((s) => s.status === "failed").length, color: "text-red-500" },
 ];
 
 export function DataTablePage() {
-  const [selected, setSelected] = useState<Sample[]>([]);
-
   return (
     <div className="p-8 space-y-6 max-w-6xl">
       <div>
         <h1 className="text-2xl font-semibold mb-1">Data Table</h1>
         <p className="text-muted-foreground text-sm">
-          Full-featured table with sorting, filtering, pagination, and row selection.
+          Full-featured table with sorting, column visibility, and pagination.
         </p>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
-          {selected.length > 0 && (
-            <>
-              <Badge variant="primary">{selected.length} selected</Badge>
-              <Button variant="secondary" size="small" onClick={() => setSelected([])}>
-                Clear selection
-              </Button>
-              <Button variant="tertiary" size="small">
-                Export selected
-              </Button>
-            </>
-          )}
-        </div>
-        <Button variant="primary" size="small">
-          + Add Sample
-        </Button>
-      </div>
-
-      <Card variant="outlined">
-        <Table
-          columns={columns}
-          data={samples}
-          pageSize={8}
-          rowKey="id"
-          selectable
-          onRowSelect={setSelected}
-          selectedRows={selected}
-        />
-      </Card>
-
       <div className="grid grid-cols-4 gap-4">
-        <Card title="Total Samples" size="small" variant="default">
-          <p className="text-2xl font-bold">{samples.length}</p>
-        </Card>
-        <Card title="Active" size="small" variant="default">
-          <p className="text-2xl font-bold text-blue-600">
-            {samples.filter((s) => s.status === "active").length}
-          </p>
-        </Card>
-        <Card title="Complete" size="small" variant="default">
-          <p className="text-2xl font-bold text-green-600">
-            {samples.filter((s) => s.status === "complete").length}
-          </p>
-        </Card>
-        <Card title="Failed" size="small" variant="default">
-          <p className="text-2xl font-bold text-red-600">
-            {samples.filter((s) => s.status === "failed").length}
-          </p>
-        </Card>
+        {stats.map((stat) => (
+          <Card key={stat.label}>
+            <CardContent className="pt-4 pb-4">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                {stat.label}
+              </p>
+              <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sample Registry</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <DataTable
+            columns={columns}
+            data={samples}
+            enableSorting
+            enableColumnVisibility
+            enablePagination
+            defaultPageSize={8}
+          >
+            <TableToolbar className="px-4 pt-3 pb-2">
+              <div className="flex items-center gap-2 ml-auto">
+                <DataTableColumnToggle />
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-1" />
+                  Export
+                </Button>
+              </div>
+            </TableToolbar>
+            <DataTablePagination />
+          </DataTable>
+        </CardContent>
+      </Card>
     </div>
   );
 }

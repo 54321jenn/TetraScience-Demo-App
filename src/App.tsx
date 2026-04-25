@@ -1,64 +1,253 @@
 import { useState } from "react";
 import {
-  AppLayout,
-  ThemeProvider,
+  BarChart2,
+  BarChart3,
+  Code2,
+  Download,
+  Filter,
+  FlaskConical,
+  LayoutGrid,
+  LogOut,
+  Moon,
+  LayoutDashboard,
+  Search,
+  Sun,
+  Table2,
+} from "lucide-react";
+import {
+  Avatar,
+  AvatarFallback,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@tetrascience-npm/tetrascience-react-ui";
-import { OverviewPage } from "./pages/OverviewPage";
-import { DataTablePage } from "./pages/DataTablePage";
-import { ChartsPage } from "./pages/ChartsPage";
-import { CodeEditorPage } from "./pages/CodeEditorPage";
 
-type Page = "overview" | "data-table" | "charts" | "code-editor";
+import { DataAppShell } from "@/components/DataAppShell";
+import { WorkflowPanel, type WorkflowStep } from "@/components/WorkflowPanel";
+import { HelpSheet } from "@/components/HelpSheet";
+import { useTheme } from "@/lib/theme";
+import { OverviewPage } from "@/pages/OverviewPage";
+import { DataTablePage } from "@/pages/DataTablePage";
+import { ChartsPage } from "@/pages/ChartsPage";
+import { CodeEditorPage } from "@/pages/CodeEditorPage";
+import { WorkflowPage } from "@/pages/WorkflowPage";
+import { PatternsPage } from "@/pages/PatternsPage";
 
-const pages: Array<{ id: Page; label: string }> = [
-  { id: "overview", label: "Components" },
-  { id: "data-table", label: "Data Table" },
-  { id: "charts", label: "Charts" },
-  { id: "code-editor", label: "Code Editor" },
+type Page = "overview" | "data-table" | "charts" | "code-editor" | "workflow" | "patterns";
+
+const PAGE_LABELS: Record<Page, string> = {
+  overview: "Components",
+  "data-table": "Data Table",
+  charts: "Charts",
+  "code-editor": "Code Editor",
+  workflow: "Workflow",
+  patterns: "Patterns",
+};
+
+const WORKFLOW_STEPS: WorkflowStep[] = [
+  { id: "data-overview", label: "Data Overview", icon: LayoutGrid, input: 649568, output: 645396 },
+  { id: "global-filtering", label: "Global Filtering", icon: Filter, input: 645396, output: 4823 },
+  { id: "explore-clusters", label: "Explore Clusters", icon: BarChart3, input: 4823, output: 20 },
+  { id: "review-selection", label: "Review Selection", icon: Search, input: 20, output: 15 },
+  { id: "export-primary-list", label: "Export Primary List", icon: Download, output: 15 },
 ];
+
+function ThemeToggle() {
+  const { resolvedTheme, toggleTheme } = useTheme();
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-7 h-7 text-muted-foreground"
+          onClick={toggleTheme}
+        >
+          {resolvedTheme === "dark" ? (
+            <Sun className="w-4 h-4" />
+          ) : (
+            <Moon className="w-4 h-4" />
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
+        {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function UserMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" className="cursor-pointer bg-transparent border-none p-0">
+          <Avatar size="sm" className="cursor-pointer hover:opacity-85 transition-opacity">
+            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+              SH
+            </AvatarFallback>
+          </Avatar>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" align="end" className="min-w-[180px]">
+        <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
+          Admin
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer text-destructive">
+          <LogOut className="w-4 h-4" />
+          Log Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function App() {
   const [activePage, setActivePage] = useState<Page>("overview");
+  const [activeStepId, setActiveStepId] = useState("data-overview");
+  const [workflowCollapsed, setWorkflowCollapsed] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  const isWorkflow = activePage === "workflow";
+  const activeStep = WORKFLOW_STEPS.find((s) => s.id === activeStepId);
+  const activeStepIndex = WORKFLOW_STEPS.findIndex((s) => s.id === activeStepId);
+  const hasNext = activeStepIndex < WORKFLOW_STEPS.length - 1;
+
+  const navGroups = [
+    {
+      pages: [
+        {
+          id: "overview",
+          label: "Components",
+          icon: LayoutGrid,
+          isActive: activePage === "overview",
+          onClick: () => setActivePage("overview"),
+        },
+        {
+          id: "data-table",
+          label: "Data Table",
+          icon: Table2,
+          isActive: activePage === "data-table",
+          onClick: () => setActivePage("data-table"),
+        },
+        {
+          id: "charts",
+          label: "Charts",
+          icon: BarChart2,
+          isActive: activePage === "charts",
+          onClick: () => setActivePage("charts"),
+        },
+        {
+          id: "code-editor",
+          label: "Code Editor",
+          icon: Code2,
+          isActive: activePage === "code-editor",
+          onClick: () => setActivePage("code-editor"),
+        },
+        {
+          id: "patterns",
+          label: "Patterns",
+          icon: LayoutDashboard,
+          isActive: activePage === "patterns",
+          onClick: () => setActivePage("patterns"),
+        },
+        {
+          id: "workflow",
+          label: "Workflow",
+          icon: FlaskConical,
+          isActive: activePage === "workflow",
+          onClick: () => setActivePage("workflow"),
+        },
+      ],
+    },
+  ];
+
+  const breadcrumbs = isWorkflow
+    ? [
+        { label: "All Datasets" },
+        { label: "DUX4", onClick: () => setActiveStepId("data-overview") },
+        { label: "Primary Screening", onClick: () => setActiveStepId("data-overview") },
+        { label: activeStep?.label ?? "" },
+      ]
+    : [{ label: "TetraScience UI" }, { label: PAGE_LABELS[activePage] }];
+
+  const workflowHeaderActions = isWorkflow ? (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 text-sm">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+          INPUT
+        </span>
+        <span className="font-semibold tabular-nums">
+          {activeStep?.input !== undefined ? activeStep.input.toLocaleString() : "—"}
+        </span>
+      </div>
+      <span className="text-muted-foreground">→</span>
+      <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-0.5 text-sm">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+          OUTPUT
+        </span>
+        <span className="font-semibold tabular-nums">
+          {activeStep?.output !== undefined ? activeStep.output.toLocaleString() : "—"}
+        </span>
+      </div>
+      <Button
+        size="sm"
+        disabled={!hasNext}
+        onClick={() => hasNext && setActiveStepId(WORKFLOW_STEPS[activeStepIndex + 1].id)}
+      >
+        Next
+      </Button>
+    </div>
+  ) : null;
+
+  const headerActions = (
+    <div className="flex items-center gap-1">
+      {workflowHeaderActions}
+      <ThemeToggle />
+    </div>
+  );
+
+  const sidebarPanel = isWorkflow ? (
+    <WorkflowPanel
+      steps={WORKFLOW_STEPS}
+      activeStepId={activeStepId}
+      onStepClick={setActiveStepId}
+      collapsed={workflowCollapsed}
+      onToggleCollapse={() => setWorkflowCollapsed((c) => !c)}
+    />
+  ) : undefined;
 
   return (
-    <ThemeProvider>
-      <AppLayout
-        userProfile={{ name: "Shelbie" }}
-        hostname="ts-ui-showcase.local"
-        organization={{ name: "TetraScience", subtext: "UI Showcase" }}
+    <>
+      <DataAppShell
+        appName="TS"
+        appFullName="TetraScience UI"
+        version="0.5.0-beta.33.1"
+        navGroups={navGroups}
+        userMenu={<UserMenu />}
+        breadcrumbs={breadcrumbs}
+        headerActions={headerActions}
+        sidebarPanel={sidebarPanel}
+        onHelpClick={() => setHelpOpen(true)}
       >
-        <div className="flex h-full min-h-screen">
-          {/* Simple nav sidebar */}
-          <nav className="w-52 shrink-0 border-r border-border bg-card flex flex-col py-6 px-3 gap-1">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-3">
-              Showcase
-            </p>
-            {pages.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setActivePage(p.id)}
-                className={[
-                  "text-sm text-left px-3 py-2 rounded-lg transition-colors w-full",
-                  activePage === p.id
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-foreground hover:bg-muted",
-                ].join(" ")}
-              >
-                {p.label}
-              </button>
-            ))}
-          </nav>
+        {activePage === "overview" && <OverviewPage />}
+        {activePage === "data-table" && <DataTablePage />}
+        {activePage === "charts" && <ChartsPage />}
+        {activePage === "code-editor" && <CodeEditorPage />}
+        {activePage === "patterns" && <PatternsPage />}
+        {activePage === "workflow" && <WorkflowPage activeStepId={activeStepId} />}
+      </DataAppShell>
 
-          {/* Main content */}
-          <main className="flex-1 overflow-auto">
-            {activePage === "overview" && <OverviewPage />}
-            {activePage === "data-table" && <DataTablePage />}
-            {activePage === "charts" && <ChartsPage />}
-            {activePage === "code-editor" && <CodeEditorPage />}
-          </main>
-        </div>
-      </AppLayout>
-    </ThemeProvider>
+      <HelpSheet open={helpOpen} onOpenChange={setHelpOpen} />
+    </>
   );
 }
 
