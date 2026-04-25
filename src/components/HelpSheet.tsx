@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
   Button,
@@ -6,10 +5,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
 } from "@tetrascience-npm/tetrascience-react-ui";
 import { X } from "lucide-react";
 
@@ -103,8 +98,6 @@ interface HelpSheetProps {
 }
 
 export function HelpSheet({ open, onOpenChange }: HelpSheetProps) {
-  const [tab, setTab] = useState<"rendered" | "markdown">("rendered");
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -114,41 +107,20 @@ export function HelpSheet({ open, onOpenChange }: HelpSheetProps) {
       >
         <SheetHeader className="flex flex-row items-center justify-between px-5 py-3.5 border-b border-border shrink-0">
           <SheetTitle className="text-sm">Help & Documentation</SheetTitle>
-          <div className="flex items-center gap-2">
-            <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-              <TabsList className="h-7 text-xs">
-                <TabsTrigger value="rendered" className="h-6 text-xs px-2.5">
-                  Preview
-                </TabsTrigger>
-                <TabsTrigger value="markdown" className="h-6 text-xs px-2.5">
-                  Markdown
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-7 h-7 shrink-0 text-muted-foreground"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-7 h-7 shrink-0 text-muted-foreground"
+            onClick={() => onOpenChange(false)}
+          >
+            <X className="w-4 h-4" />
+          </Button>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto">
-          <Tabs value={tab}>
-            <TabsContent value="rendered" className="mt-0 px-6 py-5">
-              <div className="prose prose-sm dark:prose-invert max-w-none text-foreground [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-5 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1.5 [&_p]:text-sm [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_ul]:text-sm [&_ul]:space-y-0.5 [&_li]:text-muted-foreground [&_hr]:border-border [&_hr]:my-4 [&_strong]:text-foreground [&_code]:text-xs [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-muted [&_pre]:rounded-md [&_pre]:p-3 [&_pre]:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_a]:text-primary [&_a]:underline">
-                <ReactMarkdown>{HELP_MARKDOWN}</ReactMarkdown>
-              </div>
-            </TabsContent>
-            <TabsContent value="markdown" className="mt-0">
-              <pre className="text-xs font-mono leading-relaxed text-muted-foreground p-6 whitespace-pre-wrap break-words">
-                {HELP_MARKDOWN}
-              </pre>
-            </TabsContent>
-          </Tabs>
+        <div className="flex-1 overflow-y-auto px-6 py-5">
+          <div className="prose prose-sm dark:prose-invert max-w-none text-foreground [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-5 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1.5 [&_p]:text-sm [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_ul]:text-sm [&_ul]:space-y-0.5 [&_li]:text-muted-foreground [&_hr]:border-border [&_hr]:my-4 [&_strong]:text-foreground [&_code]:text-xs [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-muted [&_pre]:rounded-md [&_pre]:p-3 [&_pre]:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_a]:text-primary [&_a]:underline">
+            <ReactMarkdown>{HELP_MARKDOWN}</ReactMarkdown>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
