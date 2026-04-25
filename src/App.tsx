@@ -8,6 +8,7 @@ import {
   FlaskConical,
   LayoutGrid,
   LogOut,
+  Monitor,
   Moon,
   LayoutDashboard,
   Search,
@@ -59,8 +60,15 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   { id: "export-primary-list", label: "Export Primary List", icon: Download, output: 15 },
 ];
 
+const THEME_META = {
+  system: { icon: Monitor, label: "System theme", next: "Switch to light" },
+  light:  { icon: Sun,     label: "Light mode",   next: "Switch to dark" },
+  dark:   { icon: Moon,    label: "Dark mode",     next: "Follow system" },
+} as const;
+
 function ThemeToggle() {
-  const { resolvedTheme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
+  const { icon: Icon, label, next } = THEME_META[theme];
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -69,16 +77,13 @@ function ThemeToggle() {
           size="icon"
           className="w-7 h-7 text-muted-foreground"
           onClick={toggleTheme}
+          aria-label={label}
         >
-          {resolvedTheme === "dark" ? (
-            <Sun className="w-4 h-4" />
-          ) : (
-            <Moon className="w-4 h-4" />
-          )}
+          <Icon className="w-4 h-4" />
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom">
-        {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
+        {label} — {next}
       </TooltipContent>
     </Tooltip>
   );

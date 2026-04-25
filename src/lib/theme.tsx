@@ -7,12 +7,14 @@ type ResolvedTheme = "light" | "dark";
 interface ThemeContextValue {
   theme: Theme;
   resolvedTheme: ResolvedTheme;
+  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: "system",
   resolvedTheme: "light",
+  setTheme: () => {},
   toggleTheme: () => {},
 });
 
@@ -21,12 +23,16 @@ function getSystemTheme(): ResolvedTheme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
+  const [theme, setThemeState] = useState<Theme>(() => {
     return (localStorage.getItem("ts-showcase-theme") as Theme) ?? "system";
   });
 
-  const resolvedTheme: ResolvedTheme = theme === "system" ? getSystemTheme() : theme;
+  // Track live system preference as state so changes trigger re-renders
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(getSystemTheme);
 
+  const resolvedTheme: ResolvedTheme = theme === "system" ? systemTheme : theme;
+
+  // Apply / remove the `dark` class on <html> whenever resolved theme changes
   useEffect(() => {
     const root = document.documentElement;
     if (resolvedTheme === "dark") {
@@ -36,27 +42,32 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [resolvedTheme]);
 
-  // Listen for system preference changes when in "system" mode
+  // Always listen for OS-level preference changes so `systemTheme` stays current
   useEffect(() => {
-    if (theme !== "system") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = () => {
-      const root = document.documentElement;
-      if (mq.matches) root.classList.add("dark");
-      else root.classList.remove("dark");
-    };
+    const handler = () => setSystemTheme(mq.matches ? "dark" : "light");
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
-  }, [theme]);
+  }, []);
 
+  function setTheme(next: Theme) {
+    setThemeState(next);
+    if (next === "system") {
+      localStorage.removeItem("ts-showcase-theme");
+    } else {
+      localStorage.setItem("ts-showcase-theme", next);
+    }
+  }
+
+  // Cycle: system → light → dark → system
   function toggleTheme() {
-    const next = resolvedTheme === "dark" ? "light" : "dark";
+    const cycle: Theme[] = ["system", "light", "dark"];
+    const next = cycle[(cycle.indexOf(theme) + 1) % cycle.length];
     setTheme(next);
-    localStorage.setItem("ts-showcase-theme", next);
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
