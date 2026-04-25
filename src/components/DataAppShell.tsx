@@ -458,16 +458,18 @@ export function DataAppShell({
             onHelpClick={onHelpClick}
             headerActions={headerActions}
             mobileTrigger={
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Open navigation menu"
-                  className="md:hidden w-7 h-7 shrink-0 text-muted-foreground"
-                >
-                  <Menu className="w-4 h-4" />
-                </Button>
-              </SheetTrigger>
+              <div className="md:hidden">
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Open navigation menu"
+                    className="w-7 h-7 shrink-0 text-muted-foreground"
+                  >
+                    <Menu className="w-4 h-4" />
+                  </Button>
+                </SheetTrigger>
+              </div>
             }
           />
           <div className="flex flex-1 min-h-0 overflow-hidden">
