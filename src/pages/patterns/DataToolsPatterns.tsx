@@ -61,12 +61,12 @@ function FilterBar() {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-[160px]">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search experiments..."
-            className="pl-8 h-8 text-sm"
+            className="pl-9 h-8 text-sm"
           />
         </div>
 
