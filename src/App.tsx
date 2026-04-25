@@ -75,7 +75,6 @@ function ThemeToggle() {
         <Button
           variant="outline"
           size="icon"
-<<<<<<< HEAD
           className="w-7 h-7"
           onClick={toggleTheme}
           aria-label={label}
