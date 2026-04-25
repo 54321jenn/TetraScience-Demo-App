@@ -73,9 +73,10 @@ function ThemeToggle() {
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
-          className="w-7 h-7 text-foreground"
+<<<<<<< HEAD
+          className="w-7 h-7"
           onClick={toggleTheme}
           aria-label={label}
         >
