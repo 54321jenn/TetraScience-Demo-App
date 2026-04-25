@@ -75,7 +75,7 @@ function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="w-7 h-7 text-muted-foreground"
+          className="w-8 h-8 text-foreground/70 hover:text-foreground"
           onClick={toggleTheme}
           aria-label={label}
         >
