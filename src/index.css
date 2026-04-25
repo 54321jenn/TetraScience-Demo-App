@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@tetrascience-npm/tetrascience-react-ui/index.css";
+@import "@tetrascience-npm/tetrascience-react-ui/index.tailwind.css";
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -14,6 +15,7 @@ body {
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
+  flex-direction: column;
 }

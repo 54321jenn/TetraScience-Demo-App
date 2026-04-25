@@ -1,12 +1,23 @@
-import {
-  CodeEditor,
-  CodeScriptEditorButton,
-  SelectField,
-  Card,
-  Button,
-  TabGroup,
-} from "@tetrascience-npm/tetrascience-react-ui";
 import { useState } from "react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CodeEditor,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@tetrascience-npm/tetrascience-react-ui";
+import { ClipboardCheck, Clipboard } from "lucide-react";
 
 const pythonDefault = `import pandas as pd
 import numpy as np
@@ -58,12 +69,6 @@ const jsonDefault = `{
         "name": "Compound A",
         "concentrations": [0.01, 0.1, 1, 10, 100],
         "units": "µM"
-      },
-      {
-        "id": "CPD-002",
-        "name": "Compound B",
-        "concentrations": [0.001, 0.01, 0.1, 1, 10],
-        "units": "µM"
       }
     ],
     "readout": "fluorescence",
@@ -71,18 +76,7 @@ const jsonDefault = `{
   }
 }`;
 
-const languageOptions = [
-  { value: "python", label: "Python" },
-  { value: "sql", label: "SQL" },
-  { value: "json", label: "JSON" },
-  { value: "typescript", label: "TypeScript" },
-];
-
-const defaultCode: Record<string, string> = {
-  python: pythonDefault,
-  sql: sqlDefault,
-  json: jsonDefault,
-  typescript: `interface SampleResult {
+const tsDefault = `interface SampleResult {
   sampleId: string;
   concentration: number;
   unit: "µM" | "nM" | "mg/mL";
@@ -95,14 +89,44 @@ async function fetchResults(
   const response = await fetch(\`/api/experiments/\${experimentId}/results\`);
   if (!response.ok) throw new Error("Failed to fetch results");
   return response.json();
-}`,
+}`;
+
+const defaultCode: Record<string, string> = {
+  python: pythonDefault,
+  sql: sqlDefault,
+  json: jsonDefault,
+  typescript: tsDefault,
 };
 
+function CopyButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(code).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Button variant="outline" size="sm" onClick={handleCopy}>
+      {copied ? (
+        <>
+          <ClipboardCheck className="w-4 h-4 mr-1 text-emerald-600" />
+          Copied!
+        </>
+      ) : (
+        <>
+          <Clipboard className="w-4 h-4 mr-1" />
+          Copy
+        </>
+      )}
+    </Button>
+  );
+}
+
 export function CodeEditorPage() {
-  const [activeTab, setActiveTab] = useState("inline");
   const [language, setLanguage] = useState("python");
   const [code, setCode] = useState(pythonDefault);
-  const [savedCode, setSavedCode] = useState<string | null>(null);
 
   const handleLanguageChange = (value: string) => {
     setLanguage(value);
@@ -114,108 +138,85 @@ export function CodeEditorPage() {
       <div>
         <h1 className="text-2xl font-semibold mb-1">Code Editor</h1>
         <p className="text-muted-foreground text-sm">
-          Monaco-based code editor with syntax highlighting and a modal launch variant.
+          Monaco-based code editor with syntax highlighting for multiple languages.
         </p>
       </div>
 
-      <TabGroup
-        tabs={[
-          { id: "inline", label: "Inline Editor" },
-          { id: "modal", label: "Modal Editor" },
-        ]}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-      />
+      <Tabs defaultValue="editor">
+        <TabsList>
+          <TabsTrigger value="editor">Editor</TabsTrigger>
+          <TabsTrigger value="readonly">Read-only</TabsTrigger>
+        </TabsList>
 
-      {activeTab === "inline" && (
-        <div className="space-y-4">
+        <TabsContent value="editor" className="mt-6 space-y-4">
           <div className="flex items-center gap-4">
-            <SelectField
-              label="Language"
-              options={languageOptions}
-              value={language}
-              onChange={handleLanguageChange}
-            />
+            <div className="w-40">
+              <Select value={language} onValueChange={handleLanguageChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="python">Python</SelectItem>
+                  <SelectItem value="sql">SQL</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                  <SelectItem value="typescript">TypeScript</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <CopyButton code={code} />
           </div>
 
-          <Card variant="outlined">
-            <CodeEditor
-              value={code}
-              onChange={(val) => setCode(val ?? "")}
-              language={language}
-              height={400}
-              label={`${language.toUpperCase()} Editor`}
-              onCopy={(c) => navigator.clipboard.writeText(c).catch(() => {})}
-            />
+          <Card>
+            <CardContent className="p-0">
+              <CodeEditor
+                value={code}
+                onChange={(val) => setCode(val ?? "")}
+                language={language}
+                height={420}
+                onCopy={(c) => navigator.clipboard.writeText(c).catch(() => {})}
+              />
+            </CardContent>
           </Card>
+        </TabsContent>
 
-          {savedCode && (
-            <Card title="Last Saved Snapshot" variant="outlined" size="small">
-              <pre className="text-xs font-mono overflow-auto max-h-40 text-muted-foreground whitespace-pre-wrap">
-                {savedCode.slice(0, 300)}
-                {savedCode.length > 300 && "\n..."}
-              </pre>
-            </Card>
-          )}
-        </div>
-      )}
-
-      {activeTab === "modal" && (
-        <div className="space-y-6">
-          <Card title="CodeScriptEditorButton" variant="outlined">
-            <p className="text-sm text-muted-foreground mb-4">
-              Opens a full-screen modal with a Monaco editor. Useful for script configuration in
-              forms or cards without taking up inline space.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <CodeScriptEditorButton
-                initialCode={pythonDefault}
+        <TabsContent value="readonly" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Python Analysis Script</CardTitle>
+              <CardDescription>
+                A read-only view of a sample analysis script.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <CodeEditor
+                value={pythonDefault}
+                onChange={() => {}}
                 language="python"
-                buttonText="Edit Python Script"
-                modalTitle="Python Analysis Script"
-                onCodeSave={(saved) => setSavedCode(saved)}
-              />
-              <CodeScriptEditorButton
-                initialCode={sqlDefault}
-                language="sql"
-                buttonText="Edit SQL Query"
-                modalTitle="Data Query"
-                onCodeSave={(saved) => setSavedCode(saved)}
-              />
-              <CodeScriptEditorButton
-                initialCode={jsonDefault}
-                language="json"
-                buttonText="Edit Config"
-                modalTitle="Experiment Configuration"
-                onCodeSave={(saved) => setSavedCode(saved)}
-              />
-              <CodeScriptEditorButton
-                initialCode="# disabled"
-                language="python"
-                buttonText="Edit (Disabled)"
-                modalTitle="Disabled"
+                height={300}
                 disabled
               />
-            </div>
+            </CardContent>
           </Card>
 
-          {savedCode && (
-            <Card title="Last Saved Code" variant="outlined" size="small">
-              <pre className="text-xs font-mono overflow-auto max-h-48 text-muted-foreground whitespace-pre-wrap">
-                {savedCode.slice(0, 500)}
-                {savedCode.length > 500 && "\n..."}
-              </pre>
-              <Button
-                variant="tertiary"
-                size="small"
-                onClick={() => setSavedCode(null)}
-              >
-                Clear
-              </Button>
-            </Card>
-          )}
-        </div>
-      )}
+          <Card>
+            <CardHeader>
+              <CardTitle>SQL Query</CardTitle>
+              <CardDescription>
+                A read-only SQL query for sample data retrieval.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <CodeEditor
+                value={sqlDefault}
+                onChange={() => {}}
+                language="sql"
+                height={260}
+                disabled
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
